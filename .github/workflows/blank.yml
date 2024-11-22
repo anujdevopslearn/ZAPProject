@@ -1,24 +1,36 @@
-name: CI
+name: OWASP ZAP Scan
+
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
-  workflow_dispatch:
-env:
- TARGET: "https://medium.com"
+    branches:
+      - main  # Trigger ZAP scan on PRs targeting the `main` branch
+  push:
+    branches:
+      - main  # Or trigger on push to the `main` branch
+
 jobs:
-  build:
-    runs-on: ghcr.io/zaproxy/zaproxy:stable
+  zap_scan:
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Run a multi-line script
-        run: |
-          echo "Proceeding with OWASP ZAP Scan"
-          mkdir /zap/wrk
-          zap-api-scan.py -t $TARGET -f graphql -r report.html -I
-          cp /zar/wrk/report.html .
-      - uses: actions/upload-artifact@v4
+      # Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      # Set up Python (optional, if your application is Python-based)
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          name: zap-artifact
-          path: report.html
+          python-version: '3.8'
+          
+      # Run ZAP scan
+      - name: Run OWASP ZAP Scan
+        uses: zaproxy/action-full-scan@v0.5.0
+        with:
+          target: "https://medium.com"  # Replace with the URL of your app if it's running elsewhere
+
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: zap-report
+          path: zap-report.html  # Path to the ZAP scan report generated
