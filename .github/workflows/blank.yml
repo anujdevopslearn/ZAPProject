@@ -27,9 +27,10 @@ jobs:
         uses: zaproxy/action-api-scan@v0.9.0
         with:
           target: 'https://www.medium.com/'
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v3
         with:
           name: zap-report
-          path: zap-report.html  # Path to the ZAP scan report generated
+          path: report_html.html  # Path to the ZAP scan report generated
