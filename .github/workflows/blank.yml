@@ -1,0 +1,24 @@
+name: CI
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+env:
+ TARGET: "https://medium.com"
+jobs:
+  build:
+    runs-on: ghcr.io/zaproxy/zaproxy:stable
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run a multi-line script
+        run: |
+          echo "Proceeding with OWASP ZAP Scan"
+          mkdir /zap/wrk
+          zap-api-scan.py -t $TARGET -f graphql -r report.html -I
+          cp /zar/wrk/report.html .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zap-artifact
+          path: report.html
